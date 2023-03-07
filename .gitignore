@@ -1,0 +1,8 @@
+src/
+vendor/
+composer.lock
+gulpfile.js
+package-lock.json
+node_modules/
+.gitignore
+.env
