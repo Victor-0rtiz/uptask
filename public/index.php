@@ -24,7 +24,7 @@ $router->post("/reestablecer", [LoginController::class, "restablecer"]);
 
 //?confirmacion de cuentas
 $router->get("/mensaje", [LoginController::class, "mensaje"]);
-$router->post("/confirmar", [LoginController::class, "confirmar"]);
+$router->get("/confirmar", [LoginController::class, "confirmar"]);
 
 
 
