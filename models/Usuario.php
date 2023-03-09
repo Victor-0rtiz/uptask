@@ -10,6 +10,7 @@ class Usuario extends ActiveRecord{
     public $nombre;
     public $email;
     public $password;
+    public $password2; 
     public $token;
     public $confirmado;
 
@@ -21,7 +22,7 @@ class Usuario extends ActiveRecord{
         $this->password = $args["password"] ?? "";
         $this->password2 = $args["password2"] ?? "";
         $this->token = $args["token"] ?? "";
-        $this->confirmado = $args["confirmado"] ?? "";
+        $this->confirmado = $args["confirmado"] ?? 0;
     }
     public function validarNuevoUsuario (){
         
@@ -40,9 +41,43 @@ class Usuario extends ActiveRecord{
             self::$alertas["error"][]= "El password debe contener almenos 6 caracteres";
         }
         if ($this->password !== $this->password2) {
-            self::$alertas["error"][]= "El password debe contener almenos 6 caracteres";
+            self::$alertas["error"][]= "Los passwords no coinciden";
         }
         return self::$alertas;            
+    }
+
+    public function validarPassword(){
+        if (!$this->password) {
+            self::$alertas["error"][]= "El password no debe ir vacio";
+        }
+        if (strlen($this->password)<6) {
+            self::$alertas["error"][]= "El password debe contener almenos 6 caracteres";
+        }
+        return self::$alertas;    
+
+    }
+
+    //? Hashea los passwords
+    public function hashearPassword(){
+        $this->password = password_hash($this->password, PASSWORD_BCRYPT);
+    }
+    //?Crea tokens unicos
+    public function crearToken (){
+        $this->token = uniqid();
+    }
+
+    //valida el email
+    public function validarEmail(){
+        if (!$this->email) {
+            self::$alertas["error"][]= "El email no debe ir vacio";
+                      
+        }
+        if (!filter_var( $this->email, FILTER_VALIDATE_EMAIL)) {
+            self::$alertas["error"][]= "El email no es valido";
+                      
+        }
+        return self::$alertas;
+
     }
 }
 ?>
