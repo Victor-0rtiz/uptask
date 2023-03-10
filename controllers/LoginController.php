@@ -10,12 +10,41 @@ class LoginController
 {
     public static function login(Router $router)
     {
+        $alertas = [];
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+            //creamos una instancia de usuario
+            $auth = new Usuario($_POST);
+            //validamos
+            $alertas = $auth->validarUsuario();
+
+            if (empty($alertas)) {
+                $usuario = Usuario::where("email", $auth->email);
+                if (!$usuario || !$usuario->confirmado) {
+                   
+                    Usuario::setAlerta("error", "El usuario no existe o no esta confirmado");
+                } else {
+                    if (password_verify($auth->password, $usuario->password)) {
+                       session_start();
+                       $_SESSION["id"]= $usuario->id;
+                       $_SESSION["nombre"]= $usuario->nombre;
+                       $_SESSION["email"]= $usuario->email;
+                       $_SESSION["login"]= true;
+                       header("location: /dashboard");
+                    } else {
+                        Usuario::setAlerta("error", "Contraseña incorrecta");
+                    }
+                }
+            }
         }
-        $router->render("auth/login", ["titulo" => "Inicia Sesión"]);
+        $alertas = Usuario::getAlertas();
+        $router->render("auth/login", ["titulo" => "Inicia Sesión", "alertas" => $alertas, "usuario"=>$usuario]);
     }
     public static function logout(Router $router)
     {
+        session_start();
+        $_SESSION= [];
+        header("location: /");
     }
     public static function crear(Router $router)
     {
@@ -60,8 +89,8 @@ class LoginController
             $alertas = $usuario->validarEmail();
             if (empty($alertas)) {
                 //buscamos el usuario
-                $usuario= Usuario::where("email", $usuario->email);
-                
+                $usuario = Usuario::where("email", $usuario->email);
+
                 if ($usuario && $usuario->confirmado == "1") {
                     //creamos un nuevo token
                     $usuario->crearToken();
@@ -71,8 +100,6 @@ class LoginController
                     Usuario::setAlerta("exito", "Hemos enviado los pasos a tu correo");
                     $email = new Email($usuario->email, $usuario->nombre, $usuario->token);
                     $email->enviarInstrucciones();
-
-
                 } else {
                     Usuario::setAlerta("error", "El usuario no existe o no esta confirmado");
                 }
@@ -84,36 +111,40 @@ class LoginController
     public static function restablecer(Router $router)
     {
         //obtenemos el token
-        $token =s($_GET["token"]);
+        $token = s($_GET["token"]);
         //verificamos que haya uno
-        if(!$token) header("lcation: /");
+        if (!$token) header("lcation: /");
         $alertas = [];
         $mostrar = true;
         //buscamos un usuario con ese token
-        $usuario= Usuario::where("token",$token );
+        $usuario = Usuario::where("token", $token);
         //verificamos si esta vacio
         if (empty($usuario)) {
             Usuario::setAlerta("error", "Token no valido");
-            $mostrar= false;
+            $mostrar = false;
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             //sincronizamos la instancia
             $usuario->sincronizar($_POST);
-            $alertas =$usuario->validarPassword();
+            $alertas = $usuario->validarPassword();
             if (empty($alertas)) {
-               $usuario->hashearPassword();
-               $usuario->token= null;
-               $resultado = $usuario->guardar();
-               if ($resultado) {
-                header("location: /");
-               }
+                //hasheamos el password
+                $usuario->hashearPassword();
+                //borramos el token unico
+                $usuario->token = null;
+                //guardamos
+                $resultado = $usuario->guardar();
+
+                if ($resultado) {
+                    header("location: /");
+                }
             }
         }
 
         $alertas = Usuario::getAlertas();
-        $router->render("auth/reestablecer", ["titulo" => "Reestablecer Password", "mostrar" =>$mostrar, "alertas"=>$alertas]);
+        $router->render("auth/reestablecer", ["titulo" => "Reestablecer Password", "mostrar" => $mostrar, "alertas" => $alertas]);
     }
     public static function mensaje(Router $router)
     {

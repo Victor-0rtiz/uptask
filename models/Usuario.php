@@ -24,6 +24,22 @@ class Usuario extends ActiveRecord{
         $this->token = $args["token"] ?? "";
         $this->confirmado = $args["confirmado"] ?? 0;
     }
+
+    public function validarUsuario(){
+        if (!$this->email) {
+            self::$alertas["error"][]= "El email no debe ir vacio";
+                      
+        }
+        if (!filter_var( $this->email, FILTER_VALIDATE_EMAIL)) {
+            self::$alertas["error"][]= "El email no es valido";
+                      
+        }
+        if (!$this->password) {
+            self::$alertas["error"][]= "El password no debe ir vacio";
+        }
+        return self::$alertas;
+
+    }
     public function validarNuevoUsuario (){
         
         if (!$this->nombre) {
@@ -45,6 +61,7 @@ class Usuario extends ActiveRecord{
         }
         return self::$alertas;            
     }
+
 
     public function validarPassword(){
         if (!$this->password) {
