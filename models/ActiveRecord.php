@@ -67,6 +67,12 @@ class ActiveRecord {
         $resultado = self::consultarSQL($query);
         return array_shift( $resultado ) ;
     }
+    // Busqueda de registros por un id
+    public static function belongTo($columna, $valor) {
+        $query = "SELECT * FROM " . static::$tabla . " WHERE ${columna} = '${valor}'";
+        $resultado = self::consultarSQL($query);
+        return  $resultado;
+    }
 
     // SQL para Consultas Avanzadas.
     public static function SQL($consulta) {
