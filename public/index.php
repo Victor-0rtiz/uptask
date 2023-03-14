@@ -4,6 +4,8 @@ require_once __DIR__ . '/../includes/app.php';
 
 use Controllers\DashboardController;
 use Controllers\LoginController;
+use Controllers\TareasController;
+use Controllers\TareasControllers;
 use MVC\Router;
 $router = new Router();
 
@@ -34,6 +36,13 @@ $router->get("/crear-proyecto", [DashboardController::class, "crearProyecto"]);
 $router->post("/crear-proyecto", [DashboardController::class, "crearProyecto"]);
 $router->get("/proyecto", [DashboardController::class, "proyecto"]);
 $router->get("/perfil", [DashboardController::class, "perfil"]);
+
+//!api de tareas
+$router->get("/api/tareas", [TareasController::class, "index"]);
+$router->post("/api/tareas", [TareasController::class, "crear"]);
+$router->post("/api/tareas/actualizar", [TareasController::class, "actualizar"]);
+$router->post("/api/tareas/eliminar", [TareasController::class, "eliminar"]);
+
 
 
 
