@@ -4,7 +4,7 @@ namespace Classes;
 
 use PHPMailer\PHPMailer\PHPMailer;
 
-
+//clase para enviar emails
 class Email
 {
     protected $nombre;
@@ -30,7 +30,7 @@ class Email
 
         $mailer->setFrom("uptask@correo.com");
         $mailer->addAddress($this->email);
-        $mailer->isHTML(true);                                  //Set email format to HTML
+        $mailer->isHTML(true);                                  
         $mailer->Subject = 'Cuenta UpTask';
         $contenido = "<html>";
         $contenido .= "<p><strong>Hola " . $this->nombre . " </strong> recientemente creaste una cuenta en Uptask</p>";
@@ -52,7 +52,7 @@ class Email
 
         $mailer->setFrom("uptask@correo.com");
         $mailer->addAddress($this->email);
-        $mailer->isHTML(true);                                  //Set email format to HTML
+        $mailer->isHTML(true);                                  
         $mailer->Subject = 'Reestablece tu contraseña';
         $contenido = "<html>";
         $contenido .= "<p><strong>Hola " . $this->nombre . " </strong> Parece que olvidaste tu password</p>";

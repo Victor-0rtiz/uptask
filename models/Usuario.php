@@ -11,6 +11,8 @@ class Usuario extends ActiveRecord{
     public $email;
     public $password;
     public $password2; 
+    public $password_actual; 
+    public $password_nuevo; 
     public $token;
     public $confirmado;
 
@@ -21,6 +23,8 @@ class Usuario extends ActiveRecord{
         $this->email = $args["email"] ?? "";
         $this->password = $args["password"] ?? "";
         $this->password2 = $args["password2"] ?? "";
+        $this->password_actual = $args["password_actual"] ?? "";
+        $this->password_nuevo= $args["password_nuevo"] ?? "";
         $this->token = $args["token"] ?? "";
         $this->confirmado = $args["confirmado"] ?? 0;
     }
@@ -62,6 +66,34 @@ class Usuario extends ActiveRecord{
         return self::$alertas;            
     }
 
+    public function validarPerfil (){
+        
+        if (!$this->nombre) {
+            self::$alertas["error"][]= "El nombre de usuario no debe ir vacio";
+                       
+        }
+        if (!$this->email) {
+            self::$alertas["error"][]= "El email no debe ir vacio";
+                      
+        }
+        return self::$alertas;
+    }
+    public function validarNuevoPassword (){
+        
+        if (!$this->password_actual) {
+            self::$alertas["error"][]= "El password actual no puede ir vacio";
+                       
+        }
+        if (!$this->password_nuevo) {
+            self::$alertas["error"][]= "El password nuevo no puede ir vacio";
+                      
+        }
+        if (strlen($this->password_nuevo)<6) {
+            self::$alertas["error"][]= "El password debe tener almenos 6 caracteres";
+                      
+        }
+        return self::$alertas;
+    }
 
     public function validarPassword(){
         if (!$this->password) {
@@ -82,6 +114,10 @@ class Usuario extends ActiveRecord{
     public function crearToken (){
         $this->token = uniqid();
     }
+    //comprobar nuevo password
+    public function comprobarPassword (){
+        return password_verify($this->password_actual, $this->password);
+    }
 
     //valida el email
     public function validarEmail(){
@@ -97,4 +133,3 @@ class Usuario extends ActiveRecord{
 
     }
 }
-?>
